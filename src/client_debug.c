@@ -12,7 +12,7 @@
 
 #include "protocol.h"
 
-#define SERVER_IP   "192.168.1.127"
+#define SERVER_IP   "127.0.0.1"
 #define SERVER_PORT 6000
 
 int main( void ) {

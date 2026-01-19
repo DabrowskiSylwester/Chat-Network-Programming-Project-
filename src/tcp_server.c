@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <unistd.h> 
 #include <stdio.h>      /* For NULL */
 #include <string.h>     /* For memset */
 #include <unistd.h>     /* For close */
@@ -13,6 +14,7 @@
 #include "protocol.h"
 #include "tcp_server.h"
 
+pthread_mutex_t server_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 int start_tcp_server( uint16_t port ) {
@@ -62,32 +64,77 @@ int start_tcp_server( uint16_t port ) {
 
 
 
-void handle_tcp_client( int client_fd ) {
+// void handle_tcp_client( int client_fd ) {
+
+//     uint16_t type;
+//     uint16_t len;
+//     void * data = NULL;
+
+//     printf( "Client connected (fd=%d)\n", client_fd );
+
+//     while (1) {
+
+//         if ( recv_tlv( client_fd, &type, &data, &len ) < 0 ) {  //!!!!!REMEMBER TO CLEAN
+//             printf( "Client disconnected (fd=%d)\n", client_fd );
+//             break;
+//         }
+
+//         printf(
+//             "Received TLV: type=%u len=%u\n",
+//             type,
+//             len
+//         );
+
+//         //echo
+//         send_tlv( client_fd, type, data, len );
+
+//         free( data );           //NO MEMORY LEAK
+//     }
+
+//     close( client_fd );
+// }
+
+void * client_thread( void * arg ) {
+    
+    /* Casting to client configuration structure*/
+    client_ctx_t * ctx = ( client_ctx_t * ) arg;
+    int client_fd = ctx->client_fd;
 
     uint16_t type;
     uint16_t len;
     void * data = NULL;
 
-    printf( "Client connected (fd=%d)\n", client_fd );
+    printf( "[tcp] client connected (fd=%d)\n", client_fd );
 
     while (1) {
 
-        if ( recv_tlv( client_fd, &type, &data, &len ) < 0 ) {  //!!!!!REMEMBER TO CLEAN
-            printf( "Client disconnected (fd=%d)\n", client_fd );
+        if ( recv_tlv( client_fd, &type, &data, &len ) < 0 ) {      //receive message !!!!!!!!MEMORY LEAK DANGER
+            printf( "[tcp] client disconnected (fd=%d)\n", client_fd );
             break;
         }
 
         printf(
-            "Received TLV: type=%u len=%u\n",
+            "[tcp] received TLV type=%u len=%u\n",
             type,
             len
         );
 
-        //echo
+        sleep(10);          //debuging
+
+        /* example critical section */
+        pthread_mutex_lock( &server_mutex );
+
+        /* TODO: modify shared resources here */
+
+        pthread_mutex_unlock( &server_mutex );
+
+        /* echo back */
         send_tlv( client_fd, type, data, len );
 
-        free( data );           //NO MEMORY LEAK
+        free( data );           //OK
     }
 
     close( client_fd );
+    free( ctx );          // VERY IMPORTANT
+    return NULL;
 }
