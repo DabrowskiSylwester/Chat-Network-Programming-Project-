@@ -1,0 +1,49 @@
+# --- 1. Katalogi budowania (CMake) ---
+# To najważniejszy punkt. Ignorujemy cały folder build,
+# w którym CMake tworzy pliki tymczasowe i Makefile.
+build/
+cmake-build-debug/
+cmake-build-release/
+
+# --- 2. Pliki wykonywalne (Binarki) ---
+# Ignorujemy pliki wynikowe kompilacji zdefiniowane w CMakeLists.txt
+server
+client
+client_debug
+
+# Na wypadek, gdybyś kompilował na Windowsie (nie przez WSL)
+*.exe
+*.dll
+*.so
+*.a
+
+# --- 3. Pliki tymczasowe i obiektowe ---
+*.o
+*.obj
+
+# Jeśli przypadkiem uruchomisz cmake w głównym katalogu (nie w build/)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+
+# --- 4. Pliki IDE i Edytorów ---
+# Ustawienia VS Code (często zawierają ścieżki absolutne z Twojego komputera)
+.vscode/
+
+# Inne edytory (tak na wszelki wypadek)
+.idea/
+*.swp
+*~
+
+# --- 5. Pliki danych serwera (Logika biznesowa) ---
+# Nie chcemy wrzucać do Gita bazy użytkowników (haseł!) ani historii rozmów.
+# Te pliki powinny być tworzone przez serwer przy starcie.
+users.txt
+history.txt
+*.log
+
+# --- 6. Pliki systemowe ---
+.DS_Store
+Thumbs.db

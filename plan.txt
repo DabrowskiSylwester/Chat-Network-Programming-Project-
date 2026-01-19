@@ -1,0 +1,27 @@
+Etapy:
+    0   -   myśleć - semper et ubique
+    1   -   TLV
+    2   -   Szukanie serwera (multicast; UDP)
+    3   -   Serwer TCP
+        a   -   na początku może zwykły - potem zrobić z niego demona
+        b   -   połączenie z klientem
+        c   -   testy na echo
+    4   -   Konta użytkowników
+        a   -   pliki do zapisywania - plik na użytkownika 
+                    nazwa pliku: login
+                    zawartość: hasło i nazwa użytkownika wyświetlana na czacie
+                    login byłby niezmienny można zmienić hasło i nazwę
+        b   -   sposób na logowanie 
+        c   -   obsługa konta (funckcje do zmian parametrów)
+    5   -   Komunikacja TCP klint do klienta
+        a   -   wysyłanie przez serwer
+        b   -   kolejne pliki zapisujące historię czatu
+                    nazwa pliku: login1_login2
+    6   -   Komunikacja UDP grupa
+        a   -   multicast 
+        b   -   historia grupy do pliku
+                    nazwa pliku: nazwa_grupy
+    7   -   Interfejs użytkownika 
+        a   -   rozgryzienie konsoli i komend 
+        b   -   implementacja funkcji (wyświetlanie historii, aktywnych użytkowników, itp.) 
+    
