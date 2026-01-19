@@ -1,4 +1,4 @@
 To run:
-mkdir / cddir build
+mkdir / cd build
 cmake ..
 make
