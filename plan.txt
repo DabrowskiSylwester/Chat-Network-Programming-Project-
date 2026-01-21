@@ -6,6 +6,7 @@ Etapy:
         a   -   na początku może zwykły - potem zrobić z niego demona
         b   -   połączenie z klientem
         c   -   testy na echo
+        d   -   wątlki
     4   -   Konta użytkowników
         a   -   pliki do zapisywania - plik na użytkownika 
                     nazwa pliku: login

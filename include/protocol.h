@@ -6,9 +6,10 @@
 /* Maximum buffer sizes (subject to change) */
 #define MAX_USERNAME_LEN    32     
 #define MAX_PASSWORD_LEN    32
-#define MAX_MESSAGE_LEN     512
+#define MAX_MESSAGE_LEN     1024
 #define MAX_GROUP_NAME_LEN  32  
 #define TLV_HEADER_LENGTH   4
+
 
 /* -------------------------------------------------------------------------- */
 /* TLV Types                                  */
@@ -33,7 +34,7 @@ typedef enum {
     TLV_USERNAME,
     TLV_GROUPNAME,
     TLV_HISTORY,
-    TLV_ACTIVE_USSERS,
+    TLV_ACTIVE_USERS,
     TLV_STATUS
 } tlv_type_t;
 
@@ -53,7 +54,7 @@ typedef enum {
     CMD_CREATE_ACCOUNT,
     CMD_CHANGE_USERNAME,
     CMD_CHANGE_PASSWORD, 
-    CMD_GET_SERVER_INFO,        /* Request list of active users, groups, etc. */
+    CMD_GET_ACTIVE_USERS,        /* Request list of active users, groups, etc. */
     CMD_SEND_TO_USER,
     CMD_SEND_TO_GROUP,
     CMD_CREATE_GROUP,
@@ -71,6 +72,7 @@ typedef enum {
     STATUS_OK = 0,                /* Operation successful */
     STATUS_ERROR,                 /* General error */
     STATUS_AUTHENTICATION_ERROR,  /* Incorrect login or password */
+    STATUS_ALREADY_LOGGED_IN,
     STATUS_USER_NOT_FOUND,
     STATUS_GROUP_NOT_FOUND
 } status_t;

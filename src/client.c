@@ -12,91 +12,165 @@
 #include <errno.h>
 
 #include "protocol.h"
+#include "client_functions.h"
+#include "client_ui.h"
 
 #define MCAST_ADDR "239.0.0.1"
 #define MCAST_PORT 5000
-#define BUF_SIZE   256
+
+
 
 int main( void ) {
 
-    int sock;
-    struct sockaddr_in local_addr;
-    struct sockaddr_in mcast_addr;
-    uint8_t buf[ BUF_SIZE ];
+    struct sockaddr_in server_addr;
 
-    /* 1. Socket UDP */
-    sock = socket( AF_INET, SOCK_DGRAM, 0 );
-    if ( sock < 0 ) {
-        perror( "socket" );
-        exit( EXIT_FAILURE );
-    }
-
-    /* 2. Bind local port (for unicast reply) */
-    memset( &local_addr, 0, sizeof( local_addr ) );
-    local_addr.sin_family = AF_INET;
-    local_addr.sin_port   = htons( 0 );          // kernel wybierze port
-    local_addr.sin_addr.s_addr = htonl( INADDR_ANY );
-
-    if ( bind( sock, ( struct sockaddr * ) &local_addr,
-               sizeof( local_addr ) ) < 0 ) {
-        perror( "bind" );
-        close( sock );
-        exit( EXIT_FAILURE );
-    }
-
-    /* 3. Multicast address */
-    memset( &mcast_addr, 0, sizeof( mcast_addr ) );
-    mcast_addr.sin_family = AF_INET;
-    mcast_addr.sin_port   = htons( MCAST_PORT );
-    inet_pton( AF_INET, MCAST_ADDR, &mcast_addr.sin_addr );
-
-    /* 4. Send TLV_DISCOVER */
-    tlv_header_t hdr;
-    hdr.type   = htons( TLV_DISCOVER );
-    hdr.length = htons( 0 );
-
-    sendto(
-        sock,
-        &hdr,
-        sizeof( hdr ),
-        0,
-        ( struct sockaddr * ) &mcast_addr,
-        sizeof( mcast_addr )
-    );
-
-    printf( "TLV_DISCOVER sent\n" );
-
-    /* 5. Receive TLV_SERVER_INFO */
-    ssize_t n = recvfrom( sock, buf, BUF_SIZE, 0, NULL, NULL );
-    if ( n < ( ssize_t ) sizeof( tlv_header_t ) ) {
-        fprintf( stderr, "Received packet too small\n" );
-        close( sock );
+    if ( discover_server(   //find server addres
+            MCAST_ADDR,
+            MCAST_PORT,
+            &server_addr
+        ) < 0 ) {
+        fprintf( stderr, "Discovery failed\n" );
         return 1;
     }
 
-    tlv_header_t * rhdr = ( tlv_header_t * ) buf;
-    uint16_t type = ntohs( rhdr->type );
-    uint16_t len  = ntohs( rhdr->length );
+    /* Connect through TCP */
+    int sock = client_connect_tcp( &server_addr );
+    if ( sock < 0 ) {
+        fprintf( stderr, "TCP connect failed\n" );
+        return 1;
+    }
 
-    if ( type == TLV_SERVER_INFO && len == sizeof( server_info_t ) ) {
+    /* User interface begins - start menu*/
+    char input[ 128 ];
+    char login[ MAX_USERNAME_LEN ];
+    char password[ MAX_PASSWORD_LEN ];
+    char username[ MAX_USERNAME_LEN ];
+    int logged_in = 0;
+    
+    printf(
+        "================================\n"
+        " Simple Chat Client\n"
+        "================================\n"
+        "Login or type a command.\n"
+        "Type /help for available commands.\n"
+    );
+    
+    while ( !logged_in ) {
 
-        server_info_t info;
-        memcpy(
-            &info,
-            buf + sizeof( tlv_header_t ),
-            sizeof( info )
-        );
+        read_command( input, sizeof( input ) );
 
-        char ip_str[ INET_ADDRSTRLEN ];
-        inet_ntop( AF_INET, &info.ip, ip_str, sizeof( ip_str ) );
+        if ( strcmp( input, "/help" ) == 0 ) {
 
-        printf(
-            "Server TCP at %s:%d\n",
-            ip_str,
-            ntohs( info.port )
-        );
-    } else {
-        fprintf( stderr, "Unexpected TLV\n" );
+            printf(
+                "Available commands:\n"
+                "  <login>    login to server\n"
+                "  /create   create new account\n"
+                "  /exit     quit client\n"
+            );
+
+        } else if ( strcmp( input, "/exit" ) == 0 ) {
+
+            printf( "Bye.\n" );
+            close( sock );
+            return 0;
+
+        } else if ( strcmp( input, "/create" ) == 0 ) {
+
+            read_line( "Login: ", login, sizeof( login ) );
+            read_line( "Password: ", password, sizeof( password ) );
+            read_line( "Username: ", username, sizeof( username ) );
+
+            if ( client_create_account(
+                    sock,
+                    login,
+                    password,
+                    username
+                ) == 0 ) {
+
+                printf( "Account created successfully\n" );
+                if ( client_login( sock, login, password ) == 0 ) {
+
+                printf( "Login successful\n" );
+                logged_in = 1;
+
+            } else {
+                printf( "Login failed\n" );
+            }
+
+            } else {
+                printf( "Account creation failed\n" );
+            }
+
+        } else if ( input[0] != '\0' ) {
+
+            /* treat input as login */
+            strncpy( login, input, sizeof( login ) - 1 );
+            read_line( "Password: ", password, sizeof( password ) );
+
+            if ( client_login( sock, login, password ) == 0 ) {
+
+                printf( "Login successful\n" );
+                logged_in = 1;
+
+            } else {
+                printf( "Login failed\n" );
+            }
+        }
+    }
+
+
+    char cmd[ 128 ];
+
+    printf(
+        "Logged in as %s\n"
+        "Type /help for available commands\n",
+        login
+    );
+
+    while ( logged_in ) {
+
+        read_command( cmd, sizeof( cmd ) );
+
+        if ( strcmp( cmd, "/help" ) == 0 ) {
+
+            printf(
+                "Available commands:\n"
+                "  /users\n"
+                "  /change_password\n"
+                "  /change_username\n"
+                "  /exit\n"
+            );
+
+        } else if ( strcmp( cmd, "/users" ) == 0 ) {
+
+            client_get_active_users( sock );
+
+        } else if ( strcmp( cmd, "/change_password" ) == 0 ) {
+
+            char old_pass[ MAX_PASSWORD_LEN ];
+            char new_pass[ MAX_PASSWORD_LEN ];
+
+            read_line( "Current password: ", old_pass, sizeof( old_pass ) );
+            read_line( "New password: ", new_pass, sizeof( new_pass ) );
+
+            client_change_password( sock, old_pass, new_pass );
+
+
+        } else if ( strcmp( cmd, "/change_username" ) == 0 ) {
+
+            char new_name[ MAX_USERNAME_LEN ];
+            read_line( "New username: ", new_name, sizeof( new_name ) );
+            client_change_username( sock, new_name );
+
+        } else if ( strcmp( cmd, "/exit" ) == 0 ) {
+
+            printf( "Logging out...\n" );
+            break;
+
+        } else if ( cmd[0] != '\0' ) {
+
+            printf( "Unknown command. Type /help\n" );
+        }
     }
 
     close( sock );

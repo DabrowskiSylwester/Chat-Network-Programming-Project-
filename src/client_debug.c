@@ -2,80 +2,107 @@
 
 #include <stdio.h>      // printf, perror
 #include <stdlib.h>     // exit
-#include <string.h>     // memset
+#include <string.h>     // memset, memcpy
 #include <unistd.h>     // close
 #include <stdint.h>     // uint16_t
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <errno.h>
 
 #include "protocol.h"
+#include "client_functions.h"
+#include "client_ui.h"
 
-#define SERVER_IP   "127.0.0.1"
-#define SERVER_PORT 6000
+#define MCAST_ADDR "239.0.0.1"
+#define MCAST_PORT 5000
+
+
 
 int main( void ) {
 
-    int sock;
     struct sockaddr_in server_addr;
 
-    /* 1. Socket TCP */
-    sock = socket( AF_INET, SOCK_STREAM, 0 );
+    if ( discover_server(   //find server addres
+            MCAST_ADDR,
+            MCAST_PORT,
+            &server_addr
+        ) < 0 ) {
+        fprintf( stderr, "Discovery failed\n" );
+        return 1;
+    }
+
+    /* Connect through TCP */
+    int sock = client_connect_tcp( &server_addr );
     if ( sock < 0 ) {
-        perror( "socket" );
-        exit( EXIT_FAILURE );
+        fprintf( stderr, "TCP connect failed\n" );
+        return 1;
     }
 
-    /* 2. Server address */
-    memset( &server_addr, 0, sizeof( server_addr ) );
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port   = htons( SERVER_PORT );
-    inet_pton( AF_INET, SERVER_IP, &server_addr.sin_addr );
+    /* User interface begins - start menu*/
+    int choice;
 
-    /* 3. Connect */
-    if ( connect( sock,
-                  ( struct sockaddr * ) &server_addr,
-                  sizeof( server_addr ) ) < 0 ) {
-        perror( "connect" );
+    choice = menu_start();
+    if ( choice < 0 ){
+        return 1;
+    }
+
+    if ( choice == 0 ) {
+        printf("Bye.\n");
+        return 0;
+    }
+
+    if ( choice == 1 ) {        /* LOGIN */
+
+        char login[ MAX_USERNAME_LEN ];
+        char password[ MAX_PASSWORD_LEN ];
+
+        read_line( "Login: ", login, sizeof( login ) );
+        read_line( "Password: ", password, sizeof( password ) );
+
+        if ( client_login( sock, login, password ) == 0 ) {
+            printf("Login successful\n");
+            //getchar();   // debug  
+            client_get_active_users( sock );        //debug
+            printf("Press Enter to logout...\n");   //debug
+            getchar();                              //debug
+            //client_change_password( sock, "sekret123" );
+            client_change_username( sock, "Nowe miano");
+        } else {
+            printf("Login failed\n");
+        }
+
         close( sock );
-        exit( EXIT_FAILURE );
+        return 0;
     }
 
-    printf( "Connected to TCP server %s:%d\n",
-            SERVER_IP, SERVER_PORT );
+    if ( choice == 2 ) {        /* CREATE ACCOUNT */
 
-    /* 4. Send TLV (test message) */
-    const char * msg = "HELLO_TLV";
-    send_tlv(
-        sock,
-        1,                  // przykładowy typ TLV
-        msg,
-        strlen( msg )
-    );
+    char login[ MAX_USERNAME_LEN ];
+    char password[ MAX_PASSWORD_LEN ];
+    char username[ MAX_USERNAME_LEN ];
 
-    printf( "Sent TLV\n" );
+    read_line( "Login: ", login, sizeof( login ) );
+    read_line( "Password: ", password, sizeof( password ) );
+    read_line( "Username (display name): ", username, sizeof( username ) );
 
-    /* 5. Receive echo */
-    uint16_t type;
-    uint16_t len;
-    void * data = NULL;
-
-    if ( recv_tlv( sock, &type, &data, &len ) < 0 ) {
-        perror( "recv_tlv" );
+    if ( client_create_account(
+            sock,
+            login,
+            password,
+            username
+            ) == 0 ) {
+            printf( "Account created successfully\n" );
+        } else {
+            printf( "Account creation failed\n" );
+        }
+    
         close( sock );
-        exit( EXIT_FAILURE );
+        return 0;
     }
 
-    printf(
-        "Received echo TLV: type=%u len=%u value='%.*s'\n",
-        type,
-        len,
-        len,
-        ( char * ) data
-    );
 
-    free( data );
     close( sock );
     return 0;
 }
