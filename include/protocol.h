@@ -23,7 +23,7 @@
  * TLV_USERNAME    -> Contains a display name (can differ from login).
  * TLV_GROUPNAME   -> Contains a group name.
  * TLV_HISTORY     -> Contains chat history data.
- * TLV_ACTIVE_USSERS -> Contains user lists.
+ * TLV_ACTIVE_USERS -> Contains user lists.
  * TLV_STATUS      -> Contains a status code (see status_t).
  */
 typedef enum {

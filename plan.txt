@@ -1,19 +1,19 @@
 Etapy:
-    0   -   myśleć - semper et ubique
-    1   -   TLV
-    2   -   Szukanie serwera (multicast; UDP)
-    3   -   Serwer TCP
-        a   -   na początku może zwykły - potem zrobić z niego demona
-        b   -   połączenie z klientem
-        c   -   testy na echo
-        d   -   wątlki
-    4   -   Konta użytkowników
-        a   -   pliki do zapisywania - plik na użytkownika 
+    0   -   myśleć - semper et ubique                                                               
+    1   -   TLV                                                                                     OK
+    2   -   Szukanie serwera (multicast; UDP)                                                       OK
+    3   -   Serwer TCP                                                                              OK
+        a   -   na początku może zwykły - potem zrobić z niego demona   OK
+        b   -   połączenie z klientem                                   OK
+        c   -   testy na echo                                           OK
+        d   -   wątlki                                                  OK
+    4   -   Konta użytkowników                                                                      OK
+        a   -   pliki do zapisywania - plik na użytkownika                                          OK
                     nazwa pliku: login
                     zawartość: hasło i nazwa użytkownika wyświetlana na czacie
                     login byłby niezmienny można zmienić hasło i nazwę
-        b   -   sposób na logowanie 
-        c   -   obsługa konta (funckcje do zmian parametrów)
+        b   -   sposób na logowanie                                                                 OK
+        c   -   obsługa konta (funckcje do zmian parametrów)                                        OK
     5   -   Komunikacja TCP klint do klienta
         a   -   wysyłanie przez serwer
         b   -   kolejne pliki zapisujące historię czatu
@@ -22,7 +22,12 @@ Etapy:
         a   -   multicast 
         b   -   historia grupy do pliku
                     nazwa pliku: nazwa_grupy
-    7   -   Interfejs użytkownika 
-        a   -   rozgryzienie konsoli i komend 
-        b   -   implementacja funkcji (wyświetlanie historii, aktywnych użytkowników, itp.) 
+    7   -   Interfejs użytkownika                                                                   OK/prawie
+        a   -   rozgryzienie konsoli i komend                                                       OK
+        b   -   implementacja funkcji (wyświetlanie historii, aktywnych użytkowników, itp.)         TODO historia
+
+
+Pytania:
+1. Czy ten multicast na sztywno jest ok?
+2. 
     
