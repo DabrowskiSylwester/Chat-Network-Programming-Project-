@@ -3,9 +3,9 @@ Etapy:
     1   -   TLV                                                                                     OK
     2   -   Szukanie serwera (multicast; UDP)                                                       OK
     3   -   Serwer TCP                                                                              OK
-        a   -   na początku może zwykły - potem zrobić z niego demona   OK
-        b   -   połączenie z klientem                                   OK
-        c   -   testy na echo                                           OK
+        a   -   na początku może zwykły - potem zrobić z niego demona   OK  
+        b   -   połączenie z klientem                                   OK   
+        c   -   testy na echo                                           OK  
         d   -   wątlki                                                  OK
     4   -   Konta użytkowników                                                                      OK
         a   -   pliki do zapisywania - plik na użytkownika                                          OK
@@ -15,9 +15,27 @@ Etapy:
         b   -   sposób na logowanie                                                                 OK
         c   -   obsługa konta (funckcje do zmian parametrów)                                        OK
     5   -   Komunikacja TCP klint do klienta
-        a   -   wysyłanie przez serwer
+        a   -   wysyłanie przez serwer                                                              OK
         b   -   kolejne pliki zapisujące historię czatu
                     nazwa pliku: login1_login2
+        c   -   PROBLEM: wyświetlanie wiadomości 
+            ->  dwa wątki w kliencie                                                                OK
+        d   -   PROBLEM: komendy zwariowały                                                         OK
+            ->  wątki 'biją' się o otrzymaną wiadomość, przez to się 
+                wieszają itp. WNIOSEK: przerobić wszystko tak, aby 
+                główny wątek nie czekał nigdy na odpowiedź, lecz
+                zajmował się nią client_recv_thread (oczywiście od
+                momentu jak ten istnieje)
+        e   -   PROBLEM: czasem dokleja śmieci do wiadomości
+            ->  prawdopodobna przyczyna: /0 nie zawsze jest odczytywane
+                albo coś. - widać czasami końcówkę jakieś dłuższej starej
+                wiadomości. Sugestia: zmienić
+                    strncpy( login, data, MAX_USERNAME_LEN - 1 );
+                na:
+                    size_t n = len < MAX_USERNAME_LEN - 1 ? len : MAX_USERNAME_LEN - 1;
+                    memcpy( login, data, n );
+                    login[n] = '\0';
+
     6   -   Komunikacja UDP grupa
         a   -   multicast 
         b   -   historia grupy do pliku
@@ -25,9 +43,14 @@ Etapy:
     7   -   Interfejs użytkownika                                                                   OK/prawie
         a   -   rozgryzienie konsoli i komend                                                       OK
         b   -   implementacja funkcji (wyświetlanie historii, aktywnych użytkowników, itp.)         TODO historia
+        c   -   kolorowanka                                                                         OK 
+    8   -   Demonizacja
+        a   -   sam demon - jak zrobić
+        b   -   pliki serwera - gdzie je podziać
 
+Pytania na konsultacje:
+1. Czy ten multicast na sztywno jest ok? czy DNS?
+2. Jak wybrać adres multicast dla grup? - czy jest poptrzebny
+3. Demonizacja - jak to zrobić najlepiej?
 
-Pytania:
-1. Czy ten multicast na sztywno jest ok?
-2. 
     

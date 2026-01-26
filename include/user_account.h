@@ -218,4 +218,10 @@ void send_active_users( int client_fd );
  */
 void dump_active_users( void );
 
+active_user_t * find_active_user_by_login( const char * login );
+
+active_user_t * find_active_user_by_fd( int fd );
+
+
+
 #endif /* USER_ACCOUNT_H */

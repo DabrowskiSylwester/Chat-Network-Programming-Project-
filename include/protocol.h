@@ -33,9 +33,12 @@ typedef enum {
     TLV_MESSAGE,
     TLV_USERNAME,
     TLV_GROUPNAME,
+    TLV_GROUP_INFO,
+    TLV_GROUP_LIST,
     TLV_HISTORY,
     TLV_ACTIVE_USERS,
-    TLV_STATUS
+    TLV_STATUS,
+    TLV_UINT16
 } tlv_type_t;
 
 typedef enum {
@@ -58,8 +61,8 @@ typedef enum {
     CMD_SEND_TO_USER,
     CMD_SEND_TO_GROUP,
     CMD_CREATE_GROUP,
+    CMD_LIST_GROUPS,
     CMD_JOIN_GROUP,
-    CMD_CHANGE_GROUPNAME,
     CMD_GET_HISTORY
 } command_t;
 
@@ -74,6 +77,7 @@ typedef enum {
     STATUS_AUTHENTICATION_ERROR,  /* Incorrect login or password */
     STATUS_ALREADY_LOGGED_IN,
     STATUS_USER_NOT_FOUND,
+    STATUS_ALREADY_IN_GROUP,
     STATUS_GROUP_NOT_FOUND
 } status_t;
 

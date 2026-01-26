@@ -1,0 +1,25 @@
+"filename", "language", "CMake", "Markdown", "C++", "C", "comment", "blank", "total"
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/CMakeLists.txt", "CMake", 89, 0, 0, 0, 0, 21, 110
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/README.md", "Markdown", 0, 4, 0, 0, 0, 1, 5
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/client_functions.h", "C++", 0, 0, 44, 0, 122, 13, 179
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/client_groups.h", "C++", 0, 0, 14, 0, 0, 8, 22
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/client_ui.h", "C++", 0, 0, 38, 0, 49, 15, 102
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/groups.h", "C++", 0, 0, 28, 0, 0, 12, 40
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/history.h", "C++", 0, 0, 18, 0, 0, 6, 24
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/multicast_server.h", "C++", 0, 0, 13, 0, 51, 8, 72
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/protocol.h", "C++", 0, 0, 69, 0, 48, 18, 135
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/tcp_server.h", "C++", 0, 0, 15, 0, 51, 10, 76
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/user_account.h", "C++", 0, 0, 45, 0, 161, 22, 228
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/client.c", "C", 0, 0, 0, 197, 11, 69, 277
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/client_debug.c", "C", 0, 0, 0, 80, 4, 25, 109
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/client_functions.c", "C", 0, 0, 0, 294, 69, 80, 443
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/client_groups.c", "C", 0, 0, 0, 19, 0, 5, 24
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/client_ui.c", "C", 0, 0, 0, 246, 10, 72, 328
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/groups.c", "C", 0, 0, 0, 117, 1, 45, 163
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/history.c", "C", 0, 0, 0, 64, 2, 13, 79
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/multicast_server.c", "C", 0, 0, 0, 128, 106, 57, 291
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/protocol.c", "C", 0, 0, 0, 65, 61, 30, 156
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/server.c", "C", 0, 0, 0, 96, 19, 35, 150
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/tcp_server.c", "C", 0, 0, 0, 445, 52, 164, 661
+"/home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/user_account.c", "C", 0, 0, 0, 256, 17, 84, 357
+"Total", "-", 89, 4, 284, 2007, 834, 813, 4031

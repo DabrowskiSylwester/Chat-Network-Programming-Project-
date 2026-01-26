@@ -3,7 +3,47 @@
 
 #include <stdint.h>
 #include "protocol.h"
+#include "client_groups.h"
+#include "group_types.h"
 
+#define ANSI_COLOR_RED     "\033[31m"  // Błędy, offline
+#define ANSI_COLOR_GREEN   "\033[32m"  // Sukces, online, login
+#define ANSI_COLOR_YELLOW  "\033[33m"  // Ostrzeżenia, komunikaty systemowe
+#define ANSI_COLOR_BLUE    "\033[34m"  // Rzadko używany na czarnym tle (słabo widać)
+#define ANSI_COLOR_MAGENTA "\033[35m"  // Nagłówki, wyróżnienia
+#define ANSI_COLOR_CYAN    "\033[36m"  // Nicki użytkowników, komendy
+#define ANSI_COLOR_WHITE   "\033[37m"  // Zwykły tekst
+#define ANSI_COLOR_RESET   "\033[0m"
+
+extern pthread_mutex_t print_mutex;
+
+#define MAX_GROUPS 16
+
+typedef enum {
+    PENDING_NONE = 0,
+    PENDING_CHANGE_PASSWORD,
+    PENDING_GROUP_CREATE,
+    PENDING_GROUP_JOIN,
+    PENDING_CHANGE_USERNAME
+} pending_action_t;
+
+typedef struct client_ctx {
+    int sock;
+    int running;
+
+    pending_action_t pending;
+    //pthread_mutex_t print_mutex;
+
+    /* chat state */
+    int in_chat;
+    char chat_user[ MAX_USERNAME_LEN ];
+
+    /* group */
+    group_info_t last_group;
+    group_ctx_t groups[MAX_GROUPS];
+    int group_count; 
+    
+} client_ctx_t;
 
 /**
  * @brief Displays the startup menu and gets the user's choice.
@@ -63,5 +103,10 @@ const char * status_to_string( status_t status );
  * @param size The maximum size of the buffer (in bytes).
  */
 void read_command( char * buf, size_t size );
+
+
+void * client_recv_thread( void * arg );
+
+
 
 #endif

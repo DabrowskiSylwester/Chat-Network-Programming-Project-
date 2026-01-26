@@ -163,4 +163,18 @@ int client_change_username(
  */
 int client_get_active_users( int sock );
 
+int client_send_message(
+    int sock,
+    const char * target,
+    const char * message
+);
+
+int client_get_history(
+    int sock,
+    const char * with_user,
+    int lines
+);
+
+
+
 #endif

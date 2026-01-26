@@ -13,6 +13,7 @@
 #include <pthread.h>    // pthread_create, pthread_mutex        https://en.wikipedia.org/wiki/Pthreads
 #include <errno.h>      // errors(errno)
 #include <sys/select.h> // select() (Dla klienta)
+#include <sys/stat.h>
 #include <syslog.h>     // syslog() (Dla demona)
 
 // It is only usefull set of includes - it should be verified through work time if all of them are needed
@@ -20,6 +21,7 @@
 #include "protocol.h"
 #include "tcp_server.h"
 #include "multicast_server.h"
+#include "groups.h"
 
 
 #define MCAST_ADDR          "239.0.0.1"      // multicast addres
@@ -27,8 +29,22 @@
 #define BUF_SIZE            256
 #define SERVER_TCP_PORT     6000            // tcp port
 
+void ensure_directories(void) {
+    mkdir("data", 0755);
+    mkdir("data/users", 0755);
+    mkdir("data/history", 0755);
+    mkdir("data/groups", 0755);
+
+    if (access("data/groups/.next_id", F_OK) != 0) {
+        FILE *f = fopen("data/groups/.next_id", "w");
+        fprintf(f, "1\n");
+        fclose(f);
+    }
+}
 
 int main( void ){
+
+    ensure_directories();
 
     pthread_t mcast_tid;
 
@@ -59,6 +75,23 @@ int main( void ){
     if ( tcp_sock < 0 ) {
         exit( EXIT_FAILURE );
     }
+
+    //ensure_directories();
+
+    // //test
+    // group_info_t g;
+    // memset(&g, 0, sizeof(g));
+    
+    // if (group_create("grupa2", "test1", &g) == 0) {
+    //     printf("Created group '%s' %s:%d\n",
+    //            g.name, g.mcast_ip, g.mcast_port);
+    // } else {
+    //     printf("ERROR: group_create failed\n");
+    // }
+
+    // group_add_user("grupa2", "test2");
+    // group_add_user("grupa2", "test3");
+    // //test
 
     while (1) {
 
@@ -109,6 +142,7 @@ int main( void ){
         pthread_detach( tid );
 
     }
+
 
     
     return 0;

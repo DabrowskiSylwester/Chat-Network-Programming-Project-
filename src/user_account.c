@@ -66,6 +66,7 @@ int user_authenticate(
 
     strncpy( out_user->login, login, MAX_USERNAME_LEN - 1 );
     out_user->login[ MAX_USERNAME_LEN - 1 ] = '\0';
+    
 
     strncpy( out_user->username, stored_username, MAX_USERNAME_LEN - 1 );
     out_user->username[ MAX_USERNAME_LEN - 1 ] = '\0';
@@ -291,7 +292,8 @@ void send_active_users( int client_fd ) {
         int n = snprintf(
             buf + off,
             sizeof( buf ) - off,
-            "%s\n",
+            "<%s> %s\n",
+            u->login,
             u->username
         );
 
@@ -321,3 +323,34 @@ int is_user_logged_in( const char * login ) {
 
     return 0;
 }
+
+active_user_t * find_active_user_by_login(
+    const char * login
+) {
+    active_user_t * u = active_users;
+
+    while ( u ) {
+        if ( strcmp( u->login, login ) == 0 ){
+            return u;
+        }
+        u = u->next;
+    }
+
+    return NULL;    //if not found return NULL pointer
+}
+
+active_user_t * find_active_user_by_fd(
+    int fd
+) {
+    active_user_t * u = active_users;
+
+    while ( u ) {
+        if ( u->client_fd == fd ){
+            return u;
+        }
+        u = u->next;
+    }
+
+    return NULL; 
+}
+

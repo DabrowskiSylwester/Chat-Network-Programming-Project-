@@ -7,6 +7,7 @@
 #include <pthread.h>
 
 #define BACKLOG 10      //number of waiting TCP clients
+#define HISTORY_OUT_MAX 8192
 
 /* global mutex for shared resources */
 extern pthread_mutex_t server_mutex;

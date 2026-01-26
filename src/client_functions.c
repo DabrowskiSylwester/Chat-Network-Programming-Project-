@@ -301,30 +301,30 @@ int client_change_password(
     const char * old_password,
     const char * new_password
 ) {
-    uint16_t type, len;
-    void * data = NULL;
+    // uint16_t type, len;          //old
+    // void * data = NULL;
     command_t cmd = CMD_CHANGE_PASSWORD;
 
     send_tlv( sock, TLV_COMMAND, &cmd, sizeof( cmd ) );
     send_tlv( sock, TLV_PASSWORD, old_password, strlen( old_password ) );
     send_tlv( sock, TLV_PASSWORD, new_password, strlen( new_password ) );
 
-    if ( recv_tlv( sock, &type, &data, &len ) < 0 )
-        return -1;
+    // if ( recv_tlv( sock, &type, &data, &len ) < 0 )
+    //     return -1;
 
-    status_t status;
-    memcpy( &status, data, sizeof( status ) );
-    free( data );
+    // status_t status;
+    // memcpy( &status, data, sizeof( status ) );
+    // free( data );
 
-    if ( status != STATUS_OK ) {
-        printf(
-            "Change password failed: %s\n",
-            status_to_string( status )
-        );
-        return -1;
-    }
+    // if ( status != STATUS_OK ) {
+    //     printf(
+    //         "Change password failed: %s\n",
+    //         status_to_string( status )
+    //     );
+    //     return -1;
+    // }
 
-    printf( "Password changed successfully\n" );
+    // printf( "Password changed successfully\n" );
     return 0;
 }
 
@@ -332,36 +332,36 @@ int client_change_username(
     int sock,
     const char * new_username
 ) {
-    uint16_t type, len;
-    void * data = NULL;
+    // uint16_t type, len;  //old
+    // void * data = NULL;
     command_t cmd = CMD_CHANGE_USERNAME;
 
     send_tlv( sock, TLV_COMMAND, &cmd, sizeof( cmd ) );
     send_tlv( sock, TLV_USERNAME, new_username, strlen( new_username ) );
 
-    if ( recv_tlv( sock, &type, &data, &len ) < 0 )
-        return -1;
+    // if ( recv_tlv( sock, &type, &data, &len ) < 0 )
+    //     return -1;
 
-    status_t status;
-    memcpy( &status, data, sizeof( status ) );
-    free( data );
+    // status_t status;
+    // memcpy( &status, data, sizeof( status ) );
+    // free( data );
 
-    if ( status != STATUS_OK ) {
-        printf(
-            "Change username failed: %s\n",
-            status_to_string( status )
-        );
-        return -1;
-    }
+    // if ( status != STATUS_OK ) {
+    //     printf(
+    //         "Change username failed: %s\n",
+    //         status_to_string( status )
+    //     );
+    //     return -1;
+    // }
 
-    printf( "Username changed successfully\n" );
+    // printf( "Username changed successfully\n" );
     return 0;
 }
 
 
 int client_get_active_users( int sock ) {
-    uint16_t type, len;
-    void * data = NULL;
+    // uint16_t type, len;  //old
+    // void * data = NULL;
     command_t cmd = CMD_GET_ACTIVE_USERS;
 
     /* send command */
@@ -375,28 +375,67 @@ int client_get_active_users( int sock ) {
         return -1;
     }
 
-    /* receive response */
-    if ( recv_tlv(
-            sock,
-            &type,
-            &data,
-            &len
-        ) < 0 ) {
-        perror( "recv_tlv ACTIVE_USERS" );
-        return -1;
-    }
+    /* receive response */  //old -> all receives must ber in client_recv_tread() to avoid conflict
+    // if ( recv_tlv(
+    //         sock,
+    //         &type,
+    //         &data,
+    //         &len
+    //     ) < 0 ) {
+    //     perror( "recv_tlv ACTIVE_USERS" );
+    //     return -1;
+    // }
 
-    if ( type != TLV_ACTIVE_USERS ) {
-        fprintf( stderr, "Unexpected TLV\n" );
-        free( data );
-        return -1;
-    }
+    // if ( type != TLV_ACTIVE_USERS ) {
+    //     fprintf( stderr, "Unexpected TLV\n" );
+    //     free( data );
+    //     return -1;
+    // }
 
-    printf("\nActive users:\n");
-    fwrite( data, 1, len, stdout );
-    printf("\n");
+    // printf("\nActive users:\n");
+    // fwrite( data, 1, len, stdout );
+    // printf("\n");
 
-    free( data );
+    // free( data );
+     return 0;
+}
+
+
+
+int client_send_message(
+    int sock,
+    const char * target,
+    const char * message
+) {
+    command_t cmd = CMD_SEND_TO_USER;
+    // uint16_t type, len;  old
+    // void * data = NULL;
+
+    send_tlv( sock, TLV_COMMAND, &cmd, sizeof( cmd ) );
+    send_tlv( sock, TLV_LOGIN, target, strlen( target ) );
+    send_tlv( sock, TLV_MESSAGE, message, strlen( message ) );
+
+    /* wait for status in receiving thread */
+    
+
+    return 0;
+}
+
+int client_get_history(
+    int sock,
+    const char * with_user,
+    int lines
+) {
+    command_t cmd = CMD_GET_HISTORY;
+
+    send_tlv( sock, TLV_COMMAND, &cmd, sizeof( cmd ) );
+    send_tlv( sock, TLV_LOGIN, with_user, strlen( with_user ) );
+
+    
+    uint16_t n = htons( lines );
+    send_tlv( sock, TLV_UINT16, &n, sizeof( n ) );
+    
+
     return 0;
 }
 
