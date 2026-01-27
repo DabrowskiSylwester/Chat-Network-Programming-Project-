@@ -293,26 +293,7 @@ void * client_recv_thread( void * arg ) {
             free( data );
 
         } 
-        // else if (type == TLV_GROUP_INFO) {
-        //     pthread_mutex_lock(&print_mutex);
-                
-        //     if (ctx->pending == PENDING_GROUP_CREATE) {
-        //         memcpy(&ctx->last_group, data, sizeof(group_info_t));
-            
-        //         printf(
-        //             "[group] created '%s' at %s:%d\n",
-        //             ctx->last_group.name,
-        //             ctx->last_group.mcast_ip,
-        //             ctx->last_group.mcast_port
-        //         );
-            
-        //         ctx->pending = PENDING_NONE;
-        //     }
         
-        //     pthread_mutex_unlock(&print_mutex);
-        //     free(data);
-
-        //} 
         else if (type == TLV_GROUP_LIST) {
             pthread_mutex_lock(&print_mutex);
             printf(ANSI_COLOR_MAGENTA"\nAvailable groups:\n"ANSI_COLOR_RESET ANSI_COLOR_CYAN);

@@ -301,30 +301,15 @@ int client_change_password(
     const char * old_password,
     const char * new_password
 ) {
-    // uint16_t type, len;          //old
-    // void * data = NULL;
+    
     command_t cmd = CMD_CHANGE_PASSWORD;
 
     send_tlv( sock, TLV_COMMAND, &cmd, sizeof( cmd ) );
     send_tlv( sock, TLV_PASSWORD, old_password, strlen( old_password ) );
     send_tlv( sock, TLV_PASSWORD, new_password, strlen( new_password ) );
 
-    // if ( recv_tlv( sock, &type, &data, &len ) < 0 )
-    //     return -1;
-
-    // status_t status;
-    // memcpy( &status, data, sizeof( status ) );
-    // free( data );
-
-    // if ( status != STATUS_OK ) {
-    //     printf(
-    //         "Change password failed: %s\n",
-    //         status_to_string( status )
-    //     );
-    //     return -1;
-    // }
-
-    // printf( "Password changed successfully\n" );
+    
+   
     return 0;
 }
 
@@ -332,27 +317,13 @@ int client_change_username(
     int sock,
     const char * new_username
 ) {
-    // uint16_t type, len;  //old
-    // void * data = NULL;
+    
     command_t cmd = CMD_CHANGE_USERNAME;
 
     send_tlv( sock, TLV_COMMAND, &cmd, sizeof( cmd ) );
     send_tlv( sock, TLV_USERNAME, new_username, strlen( new_username ) );
 
-    // if ( recv_tlv( sock, &type, &data, &len ) < 0 )
-    //     return -1;
-
-    // status_t status;
-    // memcpy( &status, data, sizeof( status ) );
-    // free( data );
-
-    // if ( status != STATUS_OK ) {
-    //     printf(
-    //         "Change username failed: %s\n",
-    //         status_to_string( status )
-    //     );
-    //     return -1;
-    // }
+    
 
     // printf( "Username changed successfully\n" );
     return 0;
@@ -375,28 +346,7 @@ int client_get_active_users( int sock ) {
         return -1;
     }
 
-    /* receive response */  //old -> all receives must ber in client_recv_tread() to avoid conflict
-    // if ( recv_tlv(
-    //         sock,
-    //         &type,
-    //         &data,
-    //         &len
-    //     ) < 0 ) {
-    //     perror( "recv_tlv ACTIVE_USERS" );
-    //     return -1;
-    // }
-
-    // if ( type != TLV_ACTIVE_USERS ) {
-    //     fprintf( stderr, "Unexpected TLV\n" );
-    //     free( data );
-    //     return -1;
-    // }
-
-    // printf("\nActive users:\n");
-    // fwrite( data, 1, len, stdout );
-    // printf("\n");
-
-    // free( data );
+   
      return 0;
 }
 

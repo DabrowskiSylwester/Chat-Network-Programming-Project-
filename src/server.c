@@ -115,10 +115,7 @@ int main( void ){
         .tcp_port   = SERVER_TCP_PORT
     };
 
-    // int pthread_create(pthread_t *restrict thread,
-    //                       const pthread_attr_t *restrict attr,
-    //                       typeof(void *(void *)) *start_routine,
-    //                       void *restrict arg);
+    
 
     if ( pthread_create(        //create a POSIX tread for multicast server
             &mcast_tid,
@@ -137,22 +134,7 @@ int main( void ){
         exit( EXIT_FAILURE );
     }
 
-    //ensure_directories();
-
-    // //test
-    // group_info_t g;
-    // memset(&g, 0, sizeof(g));
-    
-    // if (group_create("grupa2", "test1", &g) == 0) {
-    //     printf("Created group '%s' %s:%d\n",
-    //            g.name, g.mcast_ip, g.mcast_port);
-    // } else {
-    //     printf("ERROR: group_create failed\n");
-    // }
-
-    // group_add_user("grupa2", "test2");
-    // group_add_user("grupa2", "test3");
-    // //test
+   
 
     while (running) {
 

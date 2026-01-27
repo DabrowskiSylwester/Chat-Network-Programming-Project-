@@ -1,0 +1,54 @@
+Date : 2026-01-27 19:23:45
+Directory : /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt
+Total : 24 files,  2940 codes, 898 comments, 989 blanks, all 4827 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C        |         12 |      2,503 |        398 |        824 |      3,725 |
+| C++      |         10 |        342 |        500 |        139 |        981 |
+| CMake    |          1 |         91 |          0 |         25 |        116 |
+| Markdown |          1 |          4 |          0 |          1 |          5 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                     | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                        |         24 |      2,940 |        898 |        989 |      4,827 |
+| . (Files)                                                                                |          2 |         95 |          0 |         26 |        121 |
+| include                                                                                  |         10 |        342 |        500 |        139 |        981 |
+| src                                                                                      |         12 |      2,503 |        398 |        824 |      3,725 |
++------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                                 | language | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/CMakeLists.txt             | CMake    |         91 |          0 |         25 |        116 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/README.md                  | Markdown |          4 |          0 |          1 |          5 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/client_functions.h | C++      |         44 |        122 |         15 |        181 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/client_groups.h    | C++      |         25 |         16 |         15 |         56 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/client_ui.h        | C++      |         45 |         50 |         21 |        116 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/group_types.h      | C++      |         21 |          0 |          8 |         29 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/groups.h           | C++      |         42 |          0 |         15 |         57 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/history.h          | C++      |         18 |          1 |          6 |         25 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/multicast_server.h | C++      |         13 |         51 |          8 |         72 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/protocol.h         | C++      |         74 |         48 |         19 |        141 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/tcp_server.h       | C++      |         15 |         51 |         10 |         76 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/include/user_account.h     | C++      |         45 |        161 |         22 |        228 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/client.c               | C        |        266 |         11 |         82 |        359 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/client_debug.c         | C        |         80 |          4 |         25 |        109 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/client_functions.c     | C        |        294 |         69 |         79 |        442 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/client_groups.c        | C        |        184 |          4 |         44 |        232 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/client_ui.c            | C        |        263 |         29 |         89 |        381 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/groups.c               | C        |        241 |         13 |         77 |        331 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/history.c              | C        |         64 |          2 |         13 |         79 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/multicast_server.c     | C        |        129 |        106 |         57 |        292 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/protocol.c             | C        |         65 |         61 |         30 |        156 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/server.c               | C        |        135 |         23 |         53 |        211 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/tcp_server.c           | C        |        527 |         58 |        191 |        776 |
+| /home/adminmint/AGH/Programowanie sieciowe/PS projekt/Projekt/src/user_account.c         | C        |        255 |         18 |         84 |        357 |
+| Total                                                                                    |          |      2,940 |        898 |        989 |      4,827 |
++------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

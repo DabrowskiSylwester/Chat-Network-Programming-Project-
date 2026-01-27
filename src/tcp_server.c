@@ -68,36 +68,6 @@ int start_tcp_server( uint16_t port ) {
 
 
 
-// void handle_tcp_client( int client_fd ) {
-
-//     uint16_t type;
-//     uint16_t len;
-//     void * data = NULL;
-
-//     printf( "Client connected (fd=%d)\n", client_fd );
-
-//     while (1) {
-
-//         if ( recv_tlv( client_fd, &type, &data, &len ) < 0 ) {  //!!!!!REMEMBER TO CLEAN
-//             printf( "Client disconnected (fd=%d)\n", client_fd );
-//             break;
-//         }
-
-//         printf(
-//             "Received TLV: type=%u len=%u\n",
-//             type,
-//             len
-//         );
-
-//         //echo
-//         send_tlv( client_fd, type, data, len );
-
-//         free( data );           //NO MEMORY LEAK
-//     }
-
-//     close( client_fd );
-// }
-
 void * client_thread( void * arg ) {
 
     client_ctx_t * ctx = ( client_ctx_t * ) arg;
