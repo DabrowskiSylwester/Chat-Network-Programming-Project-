@@ -6,14 +6,19 @@
 #include <arpa/inet.h>
 #include <dirent.h>
 #include <limits.h>
+#include <time.h>
+#include <sys/stat.h>
+#include <errno.h>
+
 
 #include "groups.h"
 
 
-#define GROUPS_DIR "data/groups/"
+//#define GROUPS_DIR "data/groups/"
 #define GROUP_MCAST_BASE "239.0.0."
 #define GROUP_MCAST_PORT 7000
 #define GROUP_MCAST_START 1
+//#define HISTORY_DIR "data/history/"
 
 extern pthread_mutex_t groups_mutex;
 
@@ -236,6 +241,90 @@ int group_send_user_groups(int client_fd, const char *login)
 
     //pthread_mutex_unlock(&groups_mutex);
     closedir(dir);
+    return 0;
+}
+
+int group_multicast_send(
+    group_info_t *g,
+    const char *login,
+    const char *username,
+    const char *msg
+) {
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+
+    struct sockaddr_in addr = {0};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(g->mcast_port);
+    inet_pton(AF_INET, g->mcast_ip, &addr.sin_addr);
+
+    char buf[1024];
+    snprintf(buf, sizeof(buf),
+        "[%s] <%s> %s : %s",
+        g->name,
+        login,
+        username,
+        msg
+    );
+
+    if ( sendto(sock, buf, strlen(buf), 0,
+           (struct sockaddr*)&addr, sizeof(addr)) < 0 ){
+        printf("DEBUG Multicast messange not sent"); 
+        return -1;
+    }
+
+    close(sock);
+    return 0;
+}
+
+int group_history_append(
+    const char *groupname,
+    const char *login_src,
+    const char * username_src,
+    const char *message
+) {
+
+    char path[512];
+
+    /* data/history/<groupname> */
+    snprintf(
+        path,
+        sizeof(path),
+        HISTORY_DIR "%s",
+        groupname
+    );
+
+    /* ensure directory exists */
+    mkdir(HISTORY_DIR, 0755);
+
+    FILE *f = fopen(path, "a");
+    if (!f) {
+        perror("fopen group history");
+        return -1;
+    }
+
+    /* timestamp */
+    time_t now = time(NULL);
+    struct tm *tm = localtime(&now);
+
+    char timebuf[64];
+    strftime(
+        timebuf,
+        sizeof(timebuf),
+        "%Y-%m-%d %H:%M:%S",
+        tm
+    );
+
+    /* zapis */
+    fprintf(
+        f,
+        "%s <%s> %s : %s\n",
+        timebuf,
+        login_src,
+        username_src,
+        message
+    );
+
+    fclose(f);
     return 0;
 }
 

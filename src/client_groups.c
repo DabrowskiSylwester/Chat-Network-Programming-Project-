@@ -51,8 +51,12 @@ static void * group_recv_thread(void *arg) {
             NULL
         );
 
-        if (n <= 0)
+        if (n <= 0){
+            if (!ctx->running){
+                break;      // ← WYJŚCIE
+            }
             continue;
+        }
 
         buf[n] = '\0';
 
@@ -146,9 +150,9 @@ group_ctx_t *find_group_ctx(client_ctx_t *ctx, const char *name) {
 
 int leave_multicast(group_ctx_t *g)
 {
-    if (!g->running)
+    if (!g->running){
         return 0;
-
+    }
     g->running = 0;
 
     printf(
@@ -172,11 +176,11 @@ int leave_multicast(group_ctx_t *g)
         sizeof(mreq)
     );
 
-    
-    close(g->sock);
+    shutdown(g->sock, SHUT_RDWR);
 
-   
     pthread_join(g->recv_tid, NULL);
+
+    close(g->sock);
 
     memset(g, 0, sizeof(*g));
     return 0;
@@ -188,4 +192,40 @@ void leave_all_groups(client_ctx_t *ctx)
         leave_multicast(&ctx->groups[i]);
     }
     ctx->group_count = 0;
+}
+
+int client_send_group_message(
+    int sock,
+    const char *groupname,
+    const char *msg
+) {
+    command_t cmd = CMD_GROUP_MSG;
+
+    /* sanity checks */
+    if (!groupname || !msg || msg[0] == '\0')
+        return -1;
+
+    /* ---- COMMAND ---- */
+    if (send_tlv(sock, TLV_COMMAND, &cmd, sizeof(cmd)) < 0)
+        return -1;
+
+    /* ---- GROUP NAME ---- */
+    if (send_tlv(
+            sock,
+            TLV_GROUPNAME,
+            groupname,
+            strlen(groupname)
+        ) < 0)
+        return -1;
+
+    /* ---- MESSAGE ---- */
+    if (send_tlv(
+            sock,
+            TLV_MESSAGE,
+            msg,
+            strlen(msg)
+        ) < 0)
+        return -1;
+
+    return 0;
 }

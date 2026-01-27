@@ -12,9 +12,11 @@
 #include <netdb.h>      // getaddrinfo (DNS)
 #include <pthread.h>    // pthread_create, pthread_mutex        https://en.wikipedia.org/wiki/Pthreads
 #include <errno.h>      // errors(errno)
-#include <sys/select.h> // select() (Dla klienta)
+#include <sys/select.h> // 
 #include <sys/stat.h>
-#include <syslog.h>     // syslog() (Dla demona)
+#include <syslog.h>     // syslog() (demona)
+#include <fcntl.h>
+#include <signal.h>
 
 // It is only usefull set of includes - it should be verified through work time if all of them are needed
 
@@ -29,20 +31,79 @@
 #define BUF_SIZE            256
 #define SERVER_TCP_PORT     6000            // tcp port
 
-void ensure_directories(void) {
-    mkdir("data", 0755);
-    mkdir("data/users", 0755);
-    mkdir("data/history", 0755);
-    mkdir("data/groups", 0755);
+void ensure_directories(void)
+{
+    if (mkdir("/var/lib/chat_server", 0755) < 0 && errno != EEXIST){
+        perror("mkdir chat_server");
+    }
 
-    if (access("data/groups/.next_id", F_OK) != 0) {
-        FILE *f = fopen("data/groups/.next_id", "w");
-        fprintf(f, "1\n");
-        fclose(f);
+    if (mkdir("/var/lib/chat_server/users", 0755) < 0 && errno != EEXIST){
+        perror("mkdir users");
+    }
+
+    if (mkdir("/var/lib/chat_server/history", 0755) < 0 && errno != EEXIST){
+        perror("mkdir history");
+    }
+
+    if (mkdir("/var/lib/chat_server/groups", 0755) < 0 && errno != EEXIST){
+        perror("mkdir groups");
     }
 }
 
-int main( void ){
+
+void daemonize(void)
+{
+    pid_t pid;
+
+    /* fork #1 */
+    pid = fork();
+    if (pid < 0)
+        exit(EXIT_FAILURE);
+    if (pid > 0)
+        exit(EXIT_SUCCESS);   // parent leaves
+
+    /* new session */
+    if (setsid() < 0)
+        exit(EXIT_FAILURE);
+
+    /* fork #2  */
+    pid = fork();
+    if (pid < 0)
+        exit(EXIT_FAILURE);
+    if (pid > 0)
+        exit(EXIT_SUCCESS);
+
+    /* files and working dir. */
+    umask(0);
+
+    chdir("/");
+
+    
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+
+    
+    open("/dev/null", O_RDONLY);
+    open("/dev/null", O_WRONLY);
+    open("/dev/null", O_WRONLY);
+}
+
+
+static volatile int running = 1;
+
+void handle_sig(int sig)
+{
+    running = 0;
+}
+
+int main( void ){  
+
+    daemonize();
+    openlog("chat_server", LOG_PID | LOG_NDELAY, LOG_DAEMON);
+
+    signal(SIGTERM, handle_sig);
+    signal(SIGINT, handle_sig);
 
     ensure_directories();
 
@@ -93,7 +154,7 @@ int main( void ){
     // group_add_user("grupa2", "test3");
     // //test
 
-    while (1) {
+    while (running) {
 
         struct sockaddr_in client_addr;
         socklen_t client_len = sizeof( client_addr );
@@ -109,7 +170,7 @@ int main( void ){
             continue;
         }
 
-        printf(
+        syslog(LOG_INFO,
             "Accepted TCP client from %s:%d\n",
             inet_ntoa( client_addr.sin_addr ),
             ntohs( client_addr.sin_port )

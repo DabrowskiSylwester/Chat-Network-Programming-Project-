@@ -42,6 +42,9 @@ typedef struct client_ctx {
     group_info_t last_group;
     group_ctx_t groups[MAX_GROUPS];
     int group_count; 
+
+    int in_group_chat;
+    char chat_group[MAX_GROUP_NAME_LEN];
     
 } client_ctx_t;
 

@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <syslog.h> 
 
 #include "protocol.h"
 #include "multicast_server.h"
@@ -215,7 +216,7 @@ void * multicast_thread( void * arg ) {
         return NULL;
     }
 
-    printf(
+    syslog( LOG_INFO,
         "[multicast] listening on %s:%u\n",
         ctx->mcast_addr,
         ctx->mcast_port
@@ -279,7 +280,7 @@ void * multicast_thread( void * arg ) {
             client_len
         );
 
-        printf(
+        syslog( LOG_INFO,
             "[multicast] replied to %s:%u\n",
             inet_ntoa( client_addr.sin_addr ),
             ntohs( client_addr.sin_port )

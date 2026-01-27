@@ -251,7 +251,7 @@ void * client_recv_thread( void * arg ) {
                     printf(ANSI_COLOR_GREEN "\n[server] Group joined successfully\n"ANSI_COLOR_RESET"> " );
                 }
                 else {
-                    printf(ANSI_COLOR_GREEN "\n[server] Unknown OK\n"ANSI_COLOR_RESET"> " );
+                    //printf(ANSI_COLOR_GREEN "\n[server] Unknown OK\n"ANSI_COLOR_RESET"> " );
                 }
             
             } else {
@@ -344,10 +344,10 @@ void * client_recv_thread( void * arg ) {
                     printf(ANSI_COLOR_RED"\n[group] too many groups\n> "ANSI_COLOR_RESET);
                 } else {
                     group_ctx_t *g = &ctx->groups[ctx->group_count++];
-                    printf( "DEBUG: \n %s, %s, %d\n",
-                        ctx->last_group.name,
-                        ctx->last_group.mcast_ip,
-                        ctx->last_group.mcast_port);
+                    // printf( "DEBUG: \n %s, %s, %d\n",
+                    //     ctx->last_group.name,
+                    //     ctx->last_group.mcast_ip,
+                    //     ctx->last_group.mcast_port);
                     join_multicast(
                         g,
                         ctx->last_group.name,

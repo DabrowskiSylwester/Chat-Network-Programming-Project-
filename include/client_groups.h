@@ -46,4 +46,11 @@ group_ctx_t *find_group_ctx(client_ctx_t *ctx, const char *name) ;
 int leave_multicast(group_ctx_t *g);
 void leave_all_groups(client_ctx_t *ctx);
 
+
+int client_send_group_message(
+    int sock,
+    const char *groupname,
+    const char *msg
+);
+
 #endif //GROUPS_H

@@ -10,7 +10,7 @@
 #include <sys/socket.h> /* For socket, connect, getsockname */
 #include <netinet/in.h> /* For struct sockaddr_in, htons */
 #include <arpa/inet.h>  /* For inet_pton, inet_ntop */
-
+#include <syslog.h> 
 #include "protocol.h"
 #include "tcp_server.h"
 #include "user_account.h"
@@ -62,7 +62,7 @@ int start_tcp_server( uint16_t port ) {
         return -1;
     }
 
-    printf( "TCP server listening on port %u\n", port );
+    syslog( LOG_INFO, "TCP server listening on port %u\n", port );
     return sock;
 }
 
@@ -111,21 +111,21 @@ void * client_thread( void * arg ) {
     char password[ MAX_PASSWORD_LEN ] = {0};
     char username[ MAX_USERNAME_LEN ] = {0};
 
-    printf( "[tcp] client connected (fd=%d)\n", client_fd );
+    syslog( LOG_INFO,"[tcp] client connected (fd=%d)\n", client_fd );
 
     while (1) {
 
         /* ---- receive TLV ---- */
         if ( recv_tlv( client_fd, &type, &data, &len ) < 0 ) {
-            printf( "[tcp] client disconnected (fd=%d)\n", client_fd );
+            syslog( LOG_INFO, "[tcp] client disconnected (fd=%d)\n", client_fd );
             break;
         }
-        printf("[DEBUG] received TLV type=%u len=%u\n", type, len);
+        syslog( LOG_INFO, "[TLV] received TLV type=%u len=%u\n", type, len);
         /* ---- handle TLV ---- */
         switch ( type ) {
 
         case TLV_COMMAND: {
-            printf( "[DEBUG] TLV_COMMAND:\n");
+            syslog( LOG_INFO, "[TLV] TLV_COMMAND:\n");
             
             command_t cmd;
 
@@ -137,11 +137,11 @@ void * client_thread( void * arg ) {
             memcpy( &cmd, data, sizeof( cmd ) );
              free( data );
             data = NULL;
-            printf("[DEBUG] received command=%u\n", cmd);
+            syslog( LOG_INFO, "[CMD] received command=%u\n", cmd);
             switch ( cmd ) {
 
             case CMD_LOGIN: {       // to login client has to send a sequence of messages
-                printf( "[DEBUG] CMD_LOGIN:\n");
+                syslog( LOG_INFO, "[CMD] CMD_LOGIN:\n");
                 
                 user_t user;
                 status_t status;
@@ -219,7 +219,7 @@ void * client_thread( void * arg ) {
 
             case CMD_CREATE_ACCOUNT: {
                 status_t status;
-                printf("[tcp] CMD_CREATE_ACCOUNT\n");
+                syslog( LOG_INFO, "[CMD] CMD_CREATE_ACCOUNT\n");
 
                 /* LOGIN */
                 if ( recv_tlv( client_fd, &type, &data, &len ) < 0 || type != TLV_LOGIN )
@@ -257,13 +257,10 @@ void * client_thread( void * arg ) {
 
                 free( data );
 
-                printf(
-                    "[tcp] create_account login='%s' password='%s' username='%s'\n",
-                    login, password, username
-                );
+                
 
                 pthread_mutex_lock( &server_mutex );
-                printf( //debug
+                syslog( LOG_INFO,
                     "[tcp] create_account login='%s' password='%s' username='%s'\n",
                     login,
                     password,
@@ -291,7 +288,7 @@ void * client_thread( void * arg ) {
             }
 
             case CMD_CHANGE_PASSWORD: {
-                printf( "[DEBUG] CMD_CHANGE_PASSWORD:\n");
+                syslog( LOG_INFO, "[CMD] CMD_CHANGE_PASSWORD:\n");
 
                 status_t status;
                 char old_pass[ MAX_PASSWORD_LEN ] = {0};
@@ -340,7 +337,7 @@ void * client_thread( void * arg ) {
 
 
             case CMD_CHANGE_USERNAME: {
-                printf( "[DEBUG] CMD_CHANGE_USERNAME:\n");
+                syslog( LOG_INFO, "[CMD] CMD_CHANGE_USERNAME:\n");
 
                 status_t status;
                         
@@ -386,7 +383,7 @@ void * client_thread( void * arg ) {
             
 
             case CMD_GET_ACTIVE_USERS: {
-                printf( "[DEBUG] CMD_GET_ACTIVE_USERS:\n");
+                syslog( LOG_INFO, "[CMD] CMD_GET_ACTIVE_USERS:\n");
 
                 pthread_mutex_lock( &server_mutex );
                 send_active_users( client_fd );
@@ -396,7 +393,7 @@ void * client_thread( void * arg ) {
             }
 
             case CMD_SEND_TO_USER: {
-                printf( "[DEBUG] CMD_SEND_TO_USER:\n");
+                syslog( LOG_INFO, "[CMD] CMD_SEND_TO_USER:\n");
                 char target[ MAX_USERNAME_LEN ] = {0};
                 char message[ MAX_MESSAGE_LEN ] = {0};
                 active_user_t * dst = NULL;
@@ -480,7 +477,7 @@ void * client_thread( void * arg ) {
                 break;
             }
             case CMD_GET_HISTORY: {
-                printf( "[DEBUG] CMD_GET_HISTORY:\n");
+                syslog( LOG_INFO, "[CMD] CMD_GET_HISTORY:\n");
 
                 char target[ MAX_USERNAME_LEN ] = {0};
                 int max_lines = 0;
@@ -519,25 +516,45 @@ void * client_thread( void * arg ) {
                     break;
                 }
 
-                char filename[ 256 ];
+                
                 char path[ 512 ];
 
-                make_history_filename(
-                    filename,
-                    sizeof( filename ),
-                    src->login,
-                    target
-                );
-            
-                snprintf( path, sizeof( path ), HISTORY_DIR "%s", filename );
-            
-                pthread_mutex_lock( &history_mutex );
+                pthread_mutex_lock(&history_mutex);
 
-                FILE * f = fopen( path, "r" );
-                if ( !f ) {
-                    pthread_mutex_unlock( &history_mutex );
+                /* ======= HISTORIA GRUPOWA ======= */
+                if (group_exists(target)) {
+                    syslog( LOG_INFO, "Group history read.");
+                    snprintf(
+                        path,
+                        sizeof(path),
+                        HISTORY_DIR "%s",
+                        target
+                    );
+                
+                /* ======= HISTORIA 1vs1 ======= */
+                } else {
+                    syslog( LOG_INFO, "Hisotry read.");
+                    char filename[256];
+                    make_history_filename(
+                        filename,
+                        sizeof(filename),
+                        src->login,
+                        target
+                    );
+                
+                    snprintf(
+                        path,
+                        sizeof(path),
+                        HISTORY_DIR "%s",
+                        filename
+                    );
+                }
+
+                FILE *f = fopen(path, "r");
+                if (!f) {
+                    pthread_mutex_unlock(&history_mutex);
                     status_t st = STATUS_ERROR;
-                    send_tlv( client_fd, TLV_STATUS, &st, sizeof( st ) );
+                    send_tlv(client_fd, TLV_STATUS, &st, sizeof(st));
                     break;
                 }
             
@@ -581,23 +598,23 @@ void * client_thread( void * arg ) {
         
             case CMD_CREATE_GROUP: {
 
-                printf( "[DEBUG] CMD_CREATE_GROUP:\n");
+                syslog( LOG_INFO, "[CMD] CMD_CREATE_GROUP:\n");
                 char groupname[MAX_GROUP_NAME_LEN] = {0};
                 group_info_t g;
                 status_t st;
                         
                 if (recv_tlv(client_fd, &type, &data, &len) < 0 || type != TLV_GROUPNAME){
-                    printf( "[DEBUG] Unexpected TLV or nothing at all:\n");
+                    syslog( LOG_INFO, "[CMD] Unexpected TLV or nothing at all:\n");
                     break;
                 }
-                printf( "[DEBUG] Received TLV_GROUPNAME:\n");  
+                syslog( LOG_INFO, "[CMD] Received TLV_GROUPNAME:\n");  
 
                 size_t n = len < sizeof(groupname)-1 ? len : sizeof(groupname)-1;
                 memcpy(groupname, data, n);
                 groupname[n] = '\0';
                 free(data);
 
-                printf( "Creating group: %s:\n",groupname);   
+                syslog( LOG_INFO, "Creating group: %s:\n",groupname);   
                 
                 pthread_mutex_lock( &groups_mutex );
                 
@@ -613,7 +630,7 @@ void * client_thread( void * arg ) {
             
                 if (st == STATUS_OK) {
                     send_tlv(client_fd, TLV_GROUP_INFO, &g, sizeof(g));
-                    printf( "[DEBUG] Group created\n");  
+                    syslog( LOG_INFO, "[group] Group created\n");  
                 }
                 
 
@@ -642,6 +659,7 @@ void * client_thread( void * arg ) {
                 status_t st;
                 group_info_t g;
 
+                syslog( LOG_INFO, "[CMD] CMD_JOIN_GROUP" );
                 if (recv_tlv(client_fd, &type, &data, &len) < 0 || type != TLV_GROUPNAME)
                     break;
 
@@ -668,7 +686,59 @@ void * client_thread( void * arg ) {
                 if (st == STATUS_OK) {
                     send_tlv(client_fd, TLV_GROUP_INFO, &g, sizeof(g)); //multicast infos
                 }
+                syslog( LOG_INFO, "[group] Group joined" );
 
+                break;
+            }
+
+            case CMD_GROUP_MSG: {
+
+                char groupname[MAX_GROUP_NAME_LEN] = {0};
+                char message[MAX_MESSAGE_LEN] = {0};
+                status_t st;
+                syslog( LOG_INFO, "[CMD] CMD_GROUP_MSG" );
+
+                active_user_t * src = NULL;
+                src = find_active_user_by_fd( client_fd );
+                /* group name */
+                if (recv_tlv(client_fd, &type, &data, &len) < 0 ||
+                    type != TLV_GROUPNAME)
+                    break;
+
+                memcpy(groupname, data, len);
+                free(data);
+
+                /* message */
+                if (recv_tlv(client_fd, &type, &data, &len) < 0 ||
+                    type != TLV_MESSAGE)
+                    break;
+
+                memcpy(message, data, len);
+                free(data);
+
+                pthread_mutex_lock(&groups_mutex);
+
+                if (!group_exists(groupname) ||
+                    !group_has_user(groupname, src->login)) {
+                    st = STATUS_ERROR;
+                    pthread_mutex_unlock(&groups_mutex);
+                    send_tlv(client_fd, TLV_STATUS, &st, sizeof(st));
+                    break;
+                }
+            
+                group_info_t g;
+                group_get_info(groupname, &g);
+            
+                pthread_mutex_unlock(&groups_mutex);
+            
+                /* --- MULTICAST SEND --- */
+                group_multicast_send(&g, src->login, src->username, message);
+            
+                /* --- HISTORY --- */
+                group_history_append(groupname, src->login, src->username, message);
+            
+                st = STATUS_OK;
+                send_tlv(client_fd, TLV_STATUS, &st, sizeof(st));
                 break;
             }
 
@@ -678,7 +748,7 @@ void * client_thread( void * arg ) {
 
             default:
                 /* unsupported command */
-                printf( "Unsupported COMMAND" );
+                syslog( LOG_INFO, "Unsupported COMMAND" );
                 break;
             }
 
@@ -687,7 +757,7 @@ void * client_thread( void * arg ) {
 
         default:
             /* unexpected TLV */
-            printf( "Unexpected TLV");
+            syslog( LOG_INFO,  "Unexpected TLV");
             free( data );
             break;
         }

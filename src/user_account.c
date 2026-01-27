@@ -1,4 +1,4 @@
-#define USER_DIR "data/users/"
+//#define USER_DIR "data/users/"
 
 #include <stdio.h>
 #include <stdlib.h>

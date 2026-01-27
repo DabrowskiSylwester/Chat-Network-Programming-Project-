@@ -10,6 +10,11 @@
 #define MAX_GROUP_NAME_LEN  32  
 #define TLV_HEADER_LENGTH   4
 
+#define BASE_DIR "/var/lib/chat_server"
+#define USER_DIR BASE_DIR "/users/"
+#define HISTORY_DIR BASE_DIR "/history/"
+#define GROUPS_DIR BASE_DIR "/groups/"
+
 
 /* -------------------------------------------------------------------------- */
 /* TLV Types                                  */
@@ -59,7 +64,7 @@ typedef enum {
     CMD_CHANGE_PASSWORD, 
     CMD_GET_ACTIVE_USERS,        /* Request list of active users, groups, etc. */
     CMD_SEND_TO_USER,
-    CMD_SEND_TO_GROUP,
+    CMD_GROUP_MSG,
     CMD_CREATE_GROUP,
     CMD_LIST_GROUPS,
     CMD_JOIN_GROUP,

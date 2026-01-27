@@ -3,8 +3,9 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "protocol.h"
 
-#define HISTORY_DIR "data/history/"
+//#define HISTORY_DIR "data/history/"
 
 
 void make_history_filename(

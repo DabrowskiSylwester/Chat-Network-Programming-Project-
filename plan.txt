@@ -1,20 +1,20 @@
 Etapy:
-    0   -   myśleć - semper et ubique                                                               
-    1   -   TLV                                                                                     OK
-    2   -   Szukanie serwera (multicast; UDP)                                                       OK
-    3   -   Serwer TCP                                                                              OK
+    0   -   myśleć - semper et ubique                                                               MB/SD chyba ;)
+    1   -   TLV                                                                                     OK  MB/SD zależnie
+    2   -   Szukanie serwera (multicast; UDP)                                                       OK  MB
+    3   -   Serwer TCP                                                                              OK  MB
         a   -   na początku może zwykły - potem zrobić z niego demona   OK  
         b   -   połączenie z klientem                                   OK   
         c   -   testy na echo                                           OK  
         d   -   wątlki                                                  OK
-    4   -   Konta użytkowników                                                                      OK
+    4   -   Konta użytkowników                                                                      OK  SD
         a   -   pliki do zapisywania - plik na użytkownika                                          OK
                     nazwa pliku: login
                     zawartość: hasło i nazwa użytkownika wyświetlana na czacie
                     login byłby niezmienny można zmienić hasło i nazwę
         b   -   sposób na logowanie                                                                 OK
         c   -   obsługa konta (funckcje do zmian parametrów)                                        OK
-    5   -   Komunikacja TCP klint do klienta
+    5   -   Komunikacja TCP klint do klienta                                                        OK SD
         a   -   wysyłanie przez serwer                                                              OK
         b   -   kolejne pliki zapisujące historię czatu
                     nazwa pliku: login1_login2
@@ -36,21 +36,18 @@ Etapy:
                     memcpy( login, data, n );
                     login[n] = '\0';
 
-    6   -   Komunikacja UDP grupa
-        a   -   multicast 
-        b   -   historia grupy do pliku
+    6   -   Komunikacja UDP grupa                                                                   OK  MB
+        a   -   multicast                                                                           OK
+        b   -   historia grupy do pliku                                                             OK  SD
                     nazwa pliku: nazwa_grupy
-    7   -   Interfejs użytkownika                                                                   OK/prawie
+    7   -   Interfejs użytkownika                                                                   OK  MB/SD zależnie od funkcji 
         a   -   rozgryzienie konsoli i komend                                                       OK
-        b   -   implementacja funkcji (wyświetlanie historii, aktywnych użytkowników, itp.)         TODO historia
-        c   -   kolorowanka                                                                         OK 
-    8   -   Demonizacja
+        b   -   implementacja funkcji (wyświetlanie historii, aktywnych użytkowników, itp.)         OK 
+        c   -   kolorowanka                                                                         OK SD
+    8   -   Demonizacja                                                                             OK MB
         a   -   sam demon - jak zrobić
         b   -   pliki serwera - gdzie je podziać
 
-Pytania na konsultacje:
-1. Czy ten multicast na sztywno jest ok? czy DNS?
-2. Jak wybrać adres multicast dla grup? - czy jest poptrzebny
-3. Demonizacja - jak to zrobić najlepiej?
+
 
     

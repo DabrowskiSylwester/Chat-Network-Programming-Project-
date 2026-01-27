@@ -152,17 +152,40 @@ int main( void ) {
         read_command( cmd, sizeof( cmd ) );
 
         /* ================= CHAT MODE ================= */
-        if ( ctx.in_chat ) {
+        if ( ctx.in_chat || ctx.in_group_chat ) {
 
             if ( strcmp( cmd, "/exit" ) == 0 ) {
-                ctx.in_chat = 0;
+                if (ctx.in_chat) {
+                printf(
+                    ANSI_COLOR_YELLOW
+                    "Leaving chat with %s\n"
+                    ANSI_COLOR_RESET,
+                    ctx.chat_user
+                );
                 ctx.chat_user[0] = '\0';
-                printf(ANSI_COLOR_YELLOW "Leaving chat\n" ANSI_COLOR_RESET);
+                ctx.in_chat = 0;
+            }
+
+            if (ctx.in_group_chat) {
+                printf(
+                    ANSI_COLOR_YELLOW
+                    "Leaving group chat [%s]\n"
+                    ANSI_COLOR_RESET,
+                    ctx.chat_group
+                );
+                ctx.chat_group[0] = '\0';
+                ctx.in_group_chat = 0;
+            }
                 continue;
-            } else if ( strcmp( cmd, "/history" ) == 0 ) {
+
+            } else if (strcmp( cmd, "/history" ) == 0 ) {
 
                 int lines = 0;   // whole history
-                client_get_history( sock, ctx.chat_user, lines );
+                if (ctx.in_chat){
+                    client_get_history( sock, ctx.chat_user, lines );
+                } else if (ctx.in_group_chat){
+                    client_get_history( sock, ctx.chat_group, lines);
+                }
                 continue;
             } else if ( strncmp( cmd, "/history", 8 ) == 0 ) {
 
@@ -174,17 +197,31 @@ int main( void ) {
                     if ( n < 0 ) n = 0;
                 }
             
-                client_get_history( sock, ctx.chat_user, n );
+                if (ctx.in_chat){
+                    client_get_history( sock, ctx.chat_user, n );
+                } else if (ctx.in_group_chat){
+                    client_get_history( sock, ctx.chat_group, n);
+                }
                 continue;
-            }
-
+            } 
 
             /* everything else = message */
-            client_send_message(
-                ctx.sock,
-                ctx.chat_user,
-                cmd
-            );
+            if (ctx.in_chat) {
+
+                client_send_message(
+                    ctx.sock,
+                    ctx.chat_user,
+                    cmd
+                );
+
+            } else if (ctx.in_group_chat) {
+
+                client_send_group_message(
+                    ctx.sock,
+                    ctx.chat_group,
+                    cmd
+                );
+            }
             continue;
         }
 
@@ -196,6 +233,7 @@ int main( void ) {
                 "Available commands:\n"
                 "  /msg <destination LOGIN>\n"
                 //"  /history <N>"
+                "  /group_msg <groupname>\n"
                 "  /group_join <name>\n"
                 "  /users\n"
                 "  /groups\n"
@@ -247,6 +285,8 @@ int main( void ) {
         } else if ( strncmp( cmd, "/msg ", 5 ) == 0 ) {
 
             ctx.in_chat = 1;
+            ctx.in_group_chat = 0;
+
             strncpy(
                 ctx.chat_user,
                 cmd + 5,
@@ -257,12 +297,48 @@ int main( void ) {
                 "Entering chat with %s\n"
                 ANSI_COLOR_CYAN
                 "Type /history <N> to print history\n"
-                "If N = 0 whole history is printed\n"
-                "Type /exit to leave chat\n",
+                "If N is not given whole history is printed\n"
+                "Type /exit to leave chat\n"ANSI_COLOR_RESET,
                 ctx.chat_user
             );
 
-        } else if ( strcmp( cmd, "/exit" ) == 0 ) {
+        } else if (strncmp(cmd, "/group_msg ", 11) == 0) {
+
+            const char *group = cmd + 11;
+
+            if (*group == '\0') {
+                printf(ANSI_COLOR_YELLOW"Usage: /group_msg <groupname>\n"ANSI_COLOR_RESET);
+                continue;
+            }
+        
+            if (!find_group_ctx(&ctx, group)) {
+                printf(ANSI_COLOR_RED"You are not in group %s\n"ANSI_COLOR_RESET, group);
+                continue;
+            }
+        
+            ctx.in_group_chat = 1;
+            ctx.in_chat = 0;
+        
+            strncpy(
+                ctx.chat_group,
+                group,
+                sizeof(ctx.chat_group) - 1
+            );
+        
+            printf(
+                ANSI_COLOR_GREEN
+                "Entering group chat [%s]\n"
+                ANSI_COLOR_CYAN
+                "Type messages to send to group\n"
+                "Type /history <N> to print history\n"
+                "If N is not given whole history is printed\n"
+                "Type /exit to leave group chat\n"
+                ANSI_COLOR_RESET,
+                ctx.chat_group
+            );
+        }
+        
+        else if ( strcmp( cmd, "/exit" ) == 0 ) {
 
             printf(ANSI_COLOR_MAGENTA "Logging out...\n"ANSI_COLOR_RESET);
             leave_all_groups(&ctx); 

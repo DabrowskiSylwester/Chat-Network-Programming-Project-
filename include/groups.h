@@ -41,4 +41,17 @@ int group_list(char *out);
 
 int group_send_user_groups(int client_fd, const char *login);
 
+int group_multicast_send(
+    group_info_t *g,
+    const char *author_login,
+    const char * author_username,
+    const char *msg
+);
+
+int group_history_append(
+    const char *group,
+    const char *author_login,
+    const char * author_username,
+    const char *msg
+);
 #endif //GROUPS_H
